@@ -5,6 +5,11 @@ let unauthorizedHandler = null;
 
 const isLocalApiUrl = (value = "") => /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//i.test(String(value).trim());
 
+const ensureApiPath = (value) => {
+  const normalized = value.replace(/\/+$/, "");
+  return /\/api$/i.test(normalized) ? normalized : `${normalized}/api`;
+};
+
 export const registerUnauthorizedHandler = (handler) => {
   unauthorizedHandler = handler;
 };
@@ -23,7 +28,7 @@ const resolveBaseUrl = () => {
       return "/api";
     }
 
-    return configuredBaseUrl;
+    return ensureApiPath(configuredBaseUrl);
   }
 
   if (runningLocally) {
