@@ -33,7 +33,7 @@ const withBoundary = (Component) => (
 const App = () => (
   <Suspense
     fallback={
-      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#fff8ef_0%,#ffffff_100%)] px-6 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#fff8f1_0%,#ffffff_100%)] px-6 text-center">
         <div>
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500" />
           <p className="mt-4 text-sm font-medium uppercase tracking-[0.28em] text-brand-600">Loading workspace</p>

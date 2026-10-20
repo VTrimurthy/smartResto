@@ -1,4 +1,6 @@
 import MenuItem from "../models/MenuItem.js";
+import { isDemoMode } from "../config/env.js";
+import { demoStore } from "./demoStore.js";
 import { createValidationError, requireMinNumber, requireNonNegativeNumber } from "./validationService.js";
 
 export const generateOrderNumber = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`;
@@ -26,9 +28,19 @@ export const normalizeOrderPayload = async (payload, existingItem = null) => {
     throw createValidationError("At least one menu item is required for an order");
   }
 
-  const catalog = nextPayload.restaurant
-    ? await MenuItem.find({ restaurant: nextPayload.restaurant }).select("name price")
-    : [];
+  let catalog = [];
+  if (nextPayload.restaurant) {
+    if (isDemoMode) {
+      const res = demoStore.list("MenuItem", { query: {} });
+      const storeItems = Array.isArray(res) ? res : res?.items || [];
+      catalog = storeItems.filter((item) => {
+        const restId = typeof item.restaurant === "object" ? item.restaurant?._id : item.restaurant;
+        return String(restId) === String(nextPayload.restaurant);
+      });
+    } else {
+      catalog = await MenuItem.find({ restaurant: nextPayload.restaurant }).select("name price");
+    }
+  }
 
   nextPayload.items = items.map((item) => {
     const match = catalog.find((menuItem) => {

@@ -84,7 +84,7 @@ export const createCrudController = (Model, options = {}) => {
       if (isDemoMode) {
         let payload = scopePayloadToUser(req, Model.modelName, req.body);
 
-        if (beforeCreate && Model.modelName !== "Order") {
+        if (beforeCreate) {
           payload = await beforeCreate(payload, req);
         }
 
@@ -125,7 +125,7 @@ export const createCrudController = (Model, options = {}) => {
           throw new Error(`${Model.modelName} not found`);
         }
 
-        if (beforeUpdate && Model.modelName !== "Order") {
+        if (beforeUpdate) {
           payload = await beforeUpdate(payload, req, existingItem);
         }
 

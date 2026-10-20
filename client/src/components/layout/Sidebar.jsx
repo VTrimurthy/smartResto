@@ -1,8 +1,8 @@
-import { PanelLeftClose, UtensilsCrossed } from "lucide-react";
+import { ChevronRight, LogOut, PanelLeftClose, ShieldCheck, Sparkles, UtensilsCrossed } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import { dashboardNavigation } from "../../data/navigation";
-import { joinClasses } from "../../utils/helpers";
+import { joinClasses, toSentenceCase } from "../../utils/helpers";
 
 const Sidebar = ({ userRole, open, onClose }) => {
   const items = dashboardNavigation.filter((item) => item.roles.includes(userRole));
@@ -10,34 +10,51 @@ const Sidebar = ({ userRole, open, onClose }) => {
   return (
     <aside
       className={joinClasses(
-        "fixed inset-y-0 left-0 z-40 w-72 transform border-r border-brand-100/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,248,240,0.98))] transition duration-300 lg:static lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 w-72 transform border-r border-brand-100/90 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,250,244,0.98))] backdrop-blur-2xl transition-transform duration-300 shadow-xl lg:static lg:translate-x-0 lg:shadow-none",
         open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
     >
-      <div className="flex h-full flex-col p-5">
-        <div className="relative mb-8 overflow-hidden rounded-[28px] border border-brand-100 bg-white/92 p-4 shadow-sm">
-          <div className="pointer-events-none absolute right-[-1.5rem] top-[-1.5rem] h-24 w-24 rounded-full bg-brand-100/70 blur-2xl" />
+      <div className="flex h-full flex-col p-5 overflow-y-auto">
+        {/* Brand Header */}
+        <div className="relative mb-6 overflow-hidden rounded-[26px] border border-brand-200/80 bg-white/95 p-4 shadow-sm">
+          <div className="pointer-events-none absolute right-[-1rem] top-[-1rem] h-24 w-24 rounded-full bg-brand-100/60 blur-xl" />
+          
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-700/20">
-                <UtensilsCrossed className="h-5 w-5" />
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-brand-100 bg-white p-1 shadow-sm">
+                <img src="/logo.png" alt="Dineazy Logo" className="h-full w-full object-contain" />
               </div>
               <div>
-                <p className="font-display text-3xl font-semibold leading-none text-stone-900">Smart Dine</p>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-brand-600">Restaurant Operations</p>
+                <p className="font-display text-2xl font-bold leading-none tracking-tight text-stone-900">
+                  Dine<span className="text-brand-500">azy</span>
+                </p>
+                <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.24em] text-brand-600">Operations Console</p>
               </div>
             </div>
-            <button type="button" className="rounded-2xl border border-brand-100 bg-white p-2 text-brand-600 lg:hidden" onClick={onClose}>
+
+            <button
+              type="button"
+              className="flex h-8 w-8 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-500 shadow-sm lg:hidden"
+              onClick={onClose}
+              aria-label="Close sidebar"
+            >
               <PanelLeftClose className="h-4 w-4" />
             </button>
           </div>
-          <div className="mt-4 rounded-2xl border border-brand-100 bg-[#fff8f1] px-3 py-3">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-brand-600">Workspace Role</p>
-            <p className="mt-1 text-sm font-semibold text-stone-800">{items.length} active modules for this team</p>
+
+          <div className="mt-4 flex items-center justify-between rounded-xl border border-brand-100/90 bg-brand-50/70 px-3 py-2 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-stone-700">{toSentenceCase(userRole)}</span>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600">
+              Permanent JWT
+            </span>
           </div>
         </div>
 
-        <nav className="space-y-2 rounded-[28px] border border-brand-100/70 bg-white/80 p-3 shadow-sm">
+        {/* Navigation Items */}
+        <nav className="space-y-1.5 rounded-[26px] border border-brand-100/70 bg-white/80 p-2.5 shadow-sm">
           {items.map((item) => {
             const Icon = item.icon;
             return (
@@ -47,29 +64,48 @@ const Sidebar = ({ userRole, open, onClose }) => {
                 end={item.to === "/dashboard"}
                 className={({ isActive }) =>
                   joinClasses(
-                    "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition",
+                    "group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-200",
                     isActive
-                      ? "bg-gradient-to-r from-brand-50 to-[#fff1e4] text-brand-700 shadow-sm"
-                      : "text-stone-600 hover:bg-[#fff4ea] hover:text-stone-900"
+                      ? "bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/25"
+                      : "text-stone-600 hover:bg-brand-50 hover:text-brand-700"
                   )
                 }
                 onClick={onClose}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-brand-100 bg-white text-brand-600">
-                  <Icon className="h-5 w-5" />
-                </span>
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={joinClasses(
+                          "flex h-8 w-8 items-center justify-center rounded-lg transition",
+                          isActive
+                            ? "bg-white/20 text-white"
+                            : "border border-brand-100 bg-white text-brand-600 group-hover:border-brand-200"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+                    {isActive && <ChevronRight className="h-3.5 w-3.5 text-white/80" />}
+                  </>
+                )}
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="mt-auto rounded-[30px] border border-brand-100 bg-gradient-to-br from-[#fff6ed] via-white to-[#fff1e3] p-5 shadow-[0_18px_40px_rgba(108,54,16,0.08)]">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-brand-600">Operations Platform</p>
-          <h3 className="mt-3 font-display text-3xl font-semibold leading-none text-stone-900">Built for premium service flow</h3>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
-            Reservations, ordering, guest assistance, and analytics stay structured in one clean workspace clients can review with confidence.
-          </p>
+        {/* Operations Platform Info Card */}
+        <div className="mt-auto pt-6">
+          <div className="rounded-[24px] border border-brand-100/80 bg-gradient-to-br from-brand-50/70 via-white to-amber-50/50 p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-brand-700">
+              <Sparkles className="h-4 w-4 text-brand-500" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em]">Smart Sync Active</p>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-stone-600">
+              Kitchen orders, bookings, and menus synchronized across all branch terminals with persistent authentication.
+            </p>
+          </div>
         </div>
       </div>
     </aside>

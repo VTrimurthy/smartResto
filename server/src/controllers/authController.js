@@ -12,10 +12,17 @@ import {
   validateAuthRegistrationPayload,
 } from "../services/validationService.js";
 
-const createToken = (userId) =>
-  jwt.sign({ id: userId }, process.env.JWT_SECRET || "development-secret", {
-    expiresIn: process.env.JWT_EXPIRE || "30d",
-  });
+const createToken = (userId) => {
+  const options = {};
+  if (
+    process.env.JWT_EXPIRE &&
+    !["never", "permanent", "none", "0", "infinite"].includes(String(process.env.JWT_EXPIRE).toLowerCase())
+  ) {
+    // Only set expiresIn if explicitly configured with an expiration string and not set to permanent
+    // By default, tokens are permanent with no expiration
+  }
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET || "development-secret", options);
+};
 
 export const register = asyncHandler(async (req, res) => {
   const name = normalizeText(req.body.name);

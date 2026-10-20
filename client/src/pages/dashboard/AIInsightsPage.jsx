@@ -1,4 +1,4 @@
-import { Bot, ChefHat, Clock3, MessageSquare } from "lucide-react";
+import { Bot, ChefHat, Clock3, Flame, MessageSquare, Send, Sparkles, Wand2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import api from "../../api/client";
@@ -24,10 +24,11 @@ const AIInsightsPage = () => {
   const [messages, setMessages] = useState([
     {
       from: "bot",
-      text: "Hi! I can help with food recommendations, restaurant timings, bookings, and support queries.",
+      text: "Hi! I am the Dineazy Operations AI Assistant. Ask about branch timings, menu pairing recommendations, booking status, or floor service rules.",
     },
   ]);
   const [error, setError] = useState("");
+  const [loadingRecs, setLoadingRecs] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,9 +46,9 @@ const AIInsightsPage = () => {
 
   const quickCards = useMemo(
     () => [
-      { title: "Decision Tools", value: 3, subtitle: "Recommendations, support guidance, and peak-hour forecasting", icon: Clock3 },
-      { title: "Operational Signals", value: insights?.insights?.length || 0, subtitle: "Insights surfaced from bookings, orders, and branch activity", icon: ChefHat },
-      { title: "Suggested Actions", value: insights?.suggestions?.length || 0, subtitle: "Practical service improvements the team can act on", icon: Bot },
+      { title: "Decision Modules", value: 3, subtitle: "Flavor matching, support engine & peak forecast", icon: Clock3 },
+      { title: "Service Signals", value: insights?.insights?.length || 0, subtitle: "Operational alerts from orders & reservations", icon: ChefHat },
+      { title: "Action Directives", value: insights?.suggestions?.length || 0, subtitle: "Immediate table turnover suggestions", icon: Bot },
     ],
     [insights]
   );
@@ -59,6 +60,7 @@ const AIInsightsPage = () => {
 
   const handleRecommendationSubmit = async (event) => {
     event.preventDefault();
+    setLoadingRecs(true);
     try {
       const response = await api.post("/ai/recommendations", {
         ...recommendationForm,
@@ -67,6 +69,8 @@ const AIInsightsPage = () => {
       setRecommendationResult(response.data.recommendations);
     } catch (requestError) {
       setError(requestError.response?.data?.message || "Unable to generate recommendations.");
+    } finally {
+      setLoadingRecs(false);
     }
   };
 
@@ -93,22 +97,26 @@ const AIInsightsPage = () => {
   };
 
   if (!insights && !error) {
-    return <LoadingScreen label="Loading AI modules..." />;
+    return <LoadingScreen label="Loading AI intelligence engines..." />;
   }
 
   return (
     <div>
       <PageHeader
-        eyebrow="AI Modules"
-        title="Service Intelligence"
-        description="Recommendation support, guest assistance, and busy-hour signals packaged for real restaurant operations."
+        eyebrow="Artificial Intelligence"
+        title="Hospitality Intelligence Suite"
+        description="Predictive demand forecasting, guest taste recommendations, and automated service assistance for kitchen and front-of-house teams."
       />
 
       {error ? (
-        <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div>
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-5 py-4 text-sm font-medium text-rose-700 shadow-sm">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-200 text-rose-800 text-xs font-bold">!</span>
+          <span>{error}</span>
+        </div>
       ) : null}
 
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
+      {/* Top 3 Metric Cards */}
+      <div className="mb-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {quickCards.map((card) => (
           <StatCard key={card.title} title={card.title} value={card.value} subtitle={card.subtitle} icon={card.icon} />
         ))}
@@ -116,147 +124,219 @@ const AIInsightsPage = () => {
 
       {insights ? (
         <>
-          <div className="mb-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">
-            <SectionCard title="Busy Hour Intelligence" subtitle="Peak demand trends generated from orders, bookings, and table activity.">
-              <BusyHourChart data={insights.busyHours} />
+          {/* Demand Signal Row */}
+          <div className="mb-8 grid gap-8 xl:grid-cols-[1.3fr_1fr]">
+            <SectionCard
+              title="Demand Traffic Concentration"
+              subtitle="Predictive busy hour model computed from historical bookings and live orders."
+            >
+              <div className="pt-2">
+                <BusyHourChart data={insights.busyHours} />
+              </div>
             </SectionCard>
-            <SectionCard title="Operations Brief" subtitle="Short takeaways managers can use before the next shift begins.">
-              <div className="space-y-4">
+
+            <SectionCard
+              title="Operational Signals & Shift Brief"
+              subtitle="Automated shift briefing insights for managers."
+            >
+              <div className="space-y-3.5 pt-1">
                 {insights.insights.map((item) => (
-                  <div key={item.title} className="rounded-3xl border border-brand-100 bg-gradient-to-br from-white to-[#fff7ef] p-4">
-                    <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">{item.detail}</p>
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-brand-100/90 bg-gradient-to-br from-white to-brand-50/40 p-4 shadow-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5 text-brand-500" />
+                      <p className="text-xs font-bold uppercase tracking-wider text-stone-900">{item.title}</p>
+                    </div>
+                    <p className="mt-2 text-xs leading-relaxed text-stone-600">{item.detail}</p>
                   </div>
                 ))}
               </div>
             </SectionCard>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-            <SectionCard title="Food Recommendation Desk" subtitle="Suggest dishes using guest preferences, budget, and spice profile in a natural way.">
+          {/* Recommendation Desk + Live Chatbot Console */}
+          <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+            {/* Recommendation Generator */}
+            <SectionCard
+              title="Culinary Recommendation Engine"
+              subtitle="Generate customized dish proposals by budget, spice profile, and dietary criteria."
+              action={
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-brand-100 bg-brand-50 text-brand-600 shadow-sm">
+                  <Wand2 className="h-5 w-5" />
+                </div>
+              }
+            >
               <form onSubmit={handleRecommendationSubmit} className="grid gap-4 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Restaurant</span>
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-stone-600">Restaurant Branch</label>
                   <select
                     name="restaurant"
                     value={recommendationForm.restaurant}
                     onChange={handleRecommendationChange}
                     className="input-shell"
                   >
-                    <option value="">All Restaurants</option>
+                    <option value="">All Branches</option>
                     {restaurants.map((restaurant) => (
                       <option key={restaurant._id} value={restaurant._id}>
                         {restaurant.name}
                       </option>
                     ))}
                   </select>
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Preference</span>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-stone-600">Flavor / Keyword Preference</label>
                   <input
                     name="preference"
                     value={recommendationForm.preference}
                     onChange={handleRecommendationChange}
                     className="input-shell"
-                    placeholder="signature, spicy, seafood"
+                    placeholder="e.g. signature, truffle, paneer, crispy"
                   />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Budget</span>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-stone-600">Max Budget (INR)</label>
                   <input
                     name="budget"
                     type="number"
                     value={recommendationForm.budget}
                     onChange={handleRecommendationChange}
                     className="input-shell"
-                    placeholder="500"
+                    placeholder="e.g. 500"
                   />
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Spice Level</span>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-stone-600">Spice Preference</label>
                   <select
                     name="spiceLevel"
                     value={recommendationForm.spiceLevel}
                     onChange={handleRecommendationChange}
                     className="input-shell"
                   >
-                    <option value="">Any</option>
+                    <option value="">Any Spice Level</option>
                     <option value="Mild">Mild</option>
                     <option value="Medium">Medium</option>
-                    <option value="Hot">Hot</option>
+                    <option value="Hot">Hot 🔥</option>
                   </select>
-                </label>
-                <label className="flex items-center justify-between rounded-2xl border border-brand-100 bg-[#fff8f1] px-4 py-3 md:col-span-2">
-                  <span className="text-sm font-medium text-slate-700">Vegetarian only</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-2xl border border-brand-100 bg-brand-50/70 px-4 py-3 md:col-span-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-stone-700">Vegetarian Dishes Only</span>
                   <input
                     name="isVeg"
                     type="checkbox"
                     checked={recommendationForm.isVeg}
                     onChange={handleRecommendationChange}
-                    className="h-5 w-5 rounded border-slate-300 text-brand-500 focus:ring-brand-300"
+                    className="h-5 w-5 rounded border-brand-300 text-brand-600 focus:ring-brand-400 cursor-pointer"
                   />
-                </label>
-                <button type="submit" className="btn-primary md:col-span-2">
-                  Find Suitable Dishes
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loadingRecs}
+                  className="btn-primary md:col-span-2 py-3 text-sm font-bold shadow-md shadow-brand-500/25"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  <span>{loadingRecs ? "Computing Matches..." : "Compute Recommendations"}</span>
                 </button>
               </form>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {recommendationResult.map((item) => (
-                  <div key={item._id} className="overflow-hidden rounded-3xl border border-brand-100 bg-white">
-                    <img src={item.image} alt={item.name} className="h-40 w-full object-cover" />
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-slate-900">{item.name}</p>
-                          <p className="text-sm text-slate-500">{item.restaurant}</p>
+              {/* Recommendation Results */}
+              {recommendationResult.length > 0 && (
+                <div className="mt-6 border-t border-brand-100/60 pt-5">
+                  <p className="mb-4 text-xs font-bold uppercase tracking-wider text-brand-700">
+                    Recommended Culinary Matches ({recommendationResult.length})
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {recommendationResult.map((item) => (
+                      <div
+                        key={item._id}
+                        className="group overflow-hidden rounded-2xl border border-brand-100/80 bg-white/95 shadow-sm transition hover:border-brand-300 hover:shadow-md"
+                      >
+                        {item.image && (
+                          <img src={item.image} alt={item.name} className="h-36 w-full object-cover group-hover:scale-105 transition" />
+                        )}
+                        <div className="p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="font-bold text-stone-900 text-sm group-hover:text-brand-600 transition">{item.name}</p>
+                              <p className="text-[11px] text-stone-400">{item.restaurant}</p>
+                            </div>
+                            <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700 border border-brand-200/60">
+                              {item.spiceLevel || "Normal"}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-xs text-stone-600 leading-relaxed">{item.reason}</p>
+                          <p className="mt-3 font-bold text-stone-900 text-sm">{formatCurrency(item.price)}</p>
                         </div>
-                        <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">{item.spiceLevel}</span>
                       </div>
-                      <p className="mt-3 text-sm text-slate-600">{item.reason}</p>
-                      <p className="mt-3 font-semibold text-brand-700">{formatCurrency(item.price)}</p>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </SectionCard>
 
-            <SectionCard title="Guest Support Console" subtitle="A guided support module for common guest questions about service, bookings, menu items, and timings.">
-              <div className="mb-4 flex items-center gap-3 rounded-[24px] border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600">
-                <MessageSquare className="h-4 w-4 text-brand-700" />
-                Replies stay friendly and short so the conversation feels like staff support, not a generic bot dump.
-              </div>
-              <div className="mb-4 space-y-3 rounded-3xl border border-brand-100 bg-gradient-to-b from-[#fff8f1] to-white p-4">
-                {messages.map((message, index) => (
-                  <div key={`${message.from}-${index}`} className={`flex ${message.from === "user" ? "justify-end" : "justify-start"}`}>
+            {/* Guest Support & Chatbot Console */}
+            <SectionCard
+              title="Live AI Operations Chatbot"
+              subtitle="Test staff and guest conversational replies in real time."
+              action={
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Online</span>
+                </div>
+              }
+            >
+              {/* Chat Message Window */}
+              <div className="space-y-3 rounded-2xl border border-brand-100/90 bg-gradient-to-b from-brand-50/40 via-white to-white p-4">
+                <div className="h-[340px] space-y-3 overflow-y-auto pr-1">
+                  {messages.map((message, index) => (
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                        message.from === "user"
-                          ? "bg-brand-600 text-white shadow-lg shadow-brand-700/15"
-                          : "border border-brand-100 bg-white text-stone-700"
-                      }`}
+                      key={`${message.from}-${index}`}
+                      className={`flex ${message.from === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      {message.text}
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-sm ${
+                          message.from === "user"
+                            ? "bg-gradient-to-r from-brand-500 to-brand-600 text-white font-medium"
+                            : "border border-brand-100 bg-white text-stone-800"
+                        }`}
+                      >
+                        {message.text}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <form onSubmit={handleChatSubmit} className="flex gap-3">
-                <input
-                  value={chatInput}
-                  onChange={(event) => setChatInput(event.target.value)}
-                  className="input-shell flex-1"
-                  placeholder="Ask about bookings, menu, timings, or recommendations..."
-                />
-                <button type="submit" className="btn-primary px-4">
-                  Send
-                </button>
-              </form>
+                  ))}
+                </div>
 
-              <div className="mt-6 space-y-3">
-                {insights.suggestions.map((suggestion) => (
-                  <div key={suggestion} className="rounded-2xl border border-brand-100 bg-[#fff8f1] p-4 text-sm text-slate-600">
-                    {suggestion}
+                <form onSubmit={handleChatSubmit} className="flex gap-2 pt-2 border-t border-brand-100/60">
+                  <input
+                    value={chatInput}
+                    onChange={(event) => setChatInput(event.target.value)}
+                    className="input-shell flex-1 text-xs"
+                    placeholder="Ask about table reservations, kitchen items, branch hours..."
+                  />
+                  <button type="submit" className="btn-primary py-2 px-4 text-xs font-bold shadow-sm">
+                    <Send className="h-3.5 w-3.5" />
+                  </button>
+                </form>
+              </div>
+
+              {/* Actionable Suggestions */}
+              <div className="mt-5 space-y-2.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">Tactical Directives</p>
+                {insights.suggestions.map((suggestion, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 rounded-xl border border-brand-100/80 bg-brand-50/50 p-3 text-xs leading-relaxed text-stone-700 font-medium"
+                  >
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-200/80 font-bold text-brand-800 text-[10px]">
+                      {idx + 1}
+                    </span>
+                    <span>{suggestion}</span>
                   </div>
                 ))}
               </div>

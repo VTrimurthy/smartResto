@@ -70,7 +70,7 @@ const FormField = ({ field, value, onChange, dependencies = {}, formValues = {} 
     return (
       <label className="block">
         <span className="mb-2 block text-sm font-medium text-stone-700">{field.label}</span>
-        <div className="rounded-[26px] border border-dashed border-brand-200 bg-[#fff8f2] p-4">
+        <div className="rounded-[26px] border border-dashed border-brand-200 bg-brand-50 p-4">
           <input
             type="file"
             accept={field.accept}

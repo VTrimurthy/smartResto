@@ -65,11 +65,9 @@ const waitForServer = async () => {
 
 const ensureJwtLifetime = (token) => {
   const payload = decodeJwtPayload(token);
-  const durationSeconds = Number(payload.exp || 0) - Number(payload.iat || 0);
-  const expectedSeconds = 30 * 24 * 60 * 60;
 
-  if (durationSeconds < expectedSeconds - 1800 || durationSeconds > expectedSeconds + 1800) {
-    throw new Error(`Expected a 30-day JWT, received ${durationSeconds} seconds`);
+  if (payload.exp !== undefined) {
+    throw new Error(`Expected permanent non-expiring JWT without exp claim, received exp: ${payload.exp}`);
   }
 };
 
@@ -436,7 +434,7 @@ const run = async () => {
 
     console.log("API smoke test passed.");
     console.log(
-      "Verified: 30-day JWT, auth, validation failures, dashboard, reports, AI, restaurant/menu/table CRUD, guest booking/reservation/order CRUD, and user CRUD."
+      "Verified: permanent non-expiring JWT, auth, validation failures, dashboard, reports, AI, restaurant/menu/table CRUD, guest booking/reservation/order CRUD, and user CRUD."
     );
   } finally {
     const cleanupOrder = [

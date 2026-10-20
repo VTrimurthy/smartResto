@@ -106,12 +106,12 @@ export const openPrintWindow = ({ title, sections }) => {
       <head>
         <title>${title}</title>
         <style>
-          body { font-family: Arial, sans-serif; margin: 32px; color: #2c1608; }
-          h1 { margin-bottom: 8px; }
-          h2 { margin-top: 32px; margin-bottom: 12px; font-size: 20px; }
+          body { font-family: Arial, sans-serif; margin: 32px; color: #18181b; }
+          h1 { margin-bottom: 8px; color: #c2410c; }
+          h2 { margin-top: 32px; margin-bottom: 12px; font-size: 20px; color: #18181b; }
           table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-          th, td { border: 1px solid #e5d8cc; padding: 10px; text-align: left; }
-          th { background: #fff2e5; }
+          th, td { border: 1px solid #ffeedb; padding: 10px; text-align: left; }
+          th { background: #fff8f1; color: #c2410c; }
           p, li { line-height: 1.6; }
         </style>
       </head>

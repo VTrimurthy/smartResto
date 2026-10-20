@@ -1,4 +1,4 @@
-import { Download, FileText, Printer } from "lucide-react";
+import { Award, BarChart3, Download, FileText, Lightbulb, Printer, Sparkles, TrendingUp, UtensilsCrossed } from "lucide-react";
 
 import BusyHourChart from "../../components/charts/BusyHourChart";
 import DonutStatusChart from "../../components/charts/DonutStatusChart";
@@ -85,90 +85,161 @@ const ReportsPage = () => {
   };
 
   if (isLoading && !report) {
-    return <LoadingScreen label="Generating reports and analytics..." />;
+    return <LoadingScreen label="Generating executive reports and analytics..." />;
   }
 
   return (
     <div>
       <PageHeader
-        eyebrow="Reports"
-        title="Performance Reporting"
-        description="Track revenue, branch output, menu movement, and service pressure from a reporting workspace that feels operational instead of academic."
+        eyebrow="Business Intelligence"
+        title="Executive Performance Reporting"
+        description="Comprehensive analysis of financial velocity, branch occupancy, menu item traction, and operational demand signals."
         action={
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={exportCsv} className="btn-secondary">
-              <Download className="mr-2 h-4 w-4" />
-              CSV
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={exportCsv}
+              className="btn-secondary py-2.5 text-xs font-bold"
+            >
+              <Download className="mr-1.5 h-4 w-4 text-brand-600" />
+              <span>Export CSV</span>
             </button>
-            <button type="button" onClick={exportPdf} className="btn-primary">
-              <Printer className="mr-2 h-4 w-4" />
-              PDF
+            <button
+              type="button"
+              onClick={exportPdf}
+              className="btn-primary py-2.5 text-xs font-bold shadow-md shadow-brand-500/25"
+            >
+              <Printer className="mr-1.5 h-4 w-4" />
+              <span>Print / PDF</span>
             </button>
           </div>
         }
       />
 
       {error ? (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div>
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-5 py-4 text-sm font-medium text-rose-700 shadow-sm">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-200 text-rose-800 text-xs font-bold">!</span>
+          <span>{error}</span>
+        </div>
       ) : null}
 
       {report ? (
         <>
-          <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {/* Top 4 Metric Highlights */}
+          <div className="mb-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {report.cards.map((card) => (
-              <StatCard key={card.title} title={card.title} value={card.value} subtitle={card.subtitle} icon={FileText} />
+              <StatCard
+                key={card.title}
+                title={card.title}
+                value={card.value}
+                subtitle={card.subtitle}
+                icon={FileText}
+              />
             ))}
           </div>
 
-          <div className="mb-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-            <SectionCard title="Revenue Performance" subtitle="Seven-day revenue and order activity trend.">
-              <LineSalesChart data={report.salesTrend} />
+          {/* Revenue Velocity & Category Mix Charts */}
+          <div className="mb-8 grid gap-8 xl:grid-cols-[1.6fr_1fr]">
+            <SectionCard
+              title="Consolidated Revenue Velocity"
+              subtitle="Seven-day revenue performance and order trajectory."
+            >
+              <div className="pt-2">
+                <LineSalesChart data={report.salesTrend} />
+              </div>
             </SectionCard>
-            <SectionCard title="Category Mix" subtitle="See where demand is landing across the menu so merchandising and prep stay aligned.">
-              <DonutStatusChart data={report.categoryMix} />
-            </SectionCard>
-          </div>
 
-          <div className="mb-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
-            <SectionCard title="Busy Hour Heat" subtitle="Peak demand signals to support staffing, prep, and table turnover decisions.">
-              <BusyHourChart data={report.busyHours} />
-            </SectionCard>
-            <SectionCard title="Narrative Summary" subtitle="Plain-language observations a manager can present in seconds during review.">
-              <div className="space-y-4">
-                {report.narrative.map((line) => (
-                  <div key={line} className="rounded-[24px] border border-stone-200 bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-                    {line}
-                  </div>
-                ))}
+            <SectionCard
+              title="Menu Category Mix"
+              subtitle="Sales contribution breakdown across appetizers, mains, desserts, and drinks."
+            >
+              <div className="pt-2">
+                <DonutStatusChart data={report.categoryMix} />
               </div>
             </SectionCard>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
-            <SectionCard title="Top Restaurants" subtitle="Revenue and booking performance by branch.">
-              <div className="space-y-4">
-                {report.topRestaurants.map((restaurant, index) => (
-                  <div key={restaurant.name} className="flex items-center justify-between rounded-3xl border border-slate-200 p-4">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Branch #{index + 1}</p>
-                      <p className="mt-1 font-semibold text-slate-900">{restaurant.name}</p>
-                      <p className="text-sm text-slate-500">
-                        {restaurant.bookings} bookings - Rating {restaurant.rating}
-                      </p>
+          {/* Busy Hour Heat & Narrative Summary */}
+          <div className="mb-8 grid gap-8 xl:grid-cols-[1.4fr_1fr]">
+            <SectionCard
+              title="Dining Volume & Busy Hour Heatmap"
+              subtitle="Demand concentration across meal hours to guide kitchen prep and staff allocation."
+            >
+              <div className="pt-2">
+                <BusyHourChart data={report.busyHours} />
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              title="Executive Narrative Summary"
+              subtitle="Automated analytical takeaways generated from live data."
+            >
+              <div className="space-y-3 pt-1">
+                {report.narrative.map((line, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 rounded-2xl border border-brand-100/80 bg-white/95 p-4 shadow-sm"
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600 border border-amber-200/80">
+                      <Lightbulb className="h-4 w-4" />
                     </div>
-                    <p className="text-lg font-bold text-amber-600">INR {restaurant.revenue.toLocaleString("en-IN")}</p>
+                    <p className="text-xs leading-relaxed text-stone-700 font-medium">{line}</p>
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          </div>
+
+          {/* Top Restaurants & Top Selling Dishes */}
+          <div className="grid gap-8 xl:grid-cols-[1.3fr_1fr]">
+            <SectionCard
+              title="Top Performing Branches"
+              subtitle="Branch ranking by gross revenue and guest table reservations."
+            >
+              <div className="space-y-3.5 pt-1">
+                {report.topRestaurants.map((restaurant, index) => (
+                  <div
+                    key={restaurant.name}
+                    className="flex items-center justify-between gap-4 rounded-2xl border border-brand-100/80 bg-white/95 p-4 shadow-sm transition hover:border-brand-200 hover:shadow-md"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 font-bold text-brand-700 text-xs shadow-inner border border-brand-100">
+                        #{index + 1}
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-stone-900">{restaurant.name}</p>
+                        <p className="text-xs text-stone-500">
+                          {restaurant.bookings} bookings • Rating: {restaurant.rating} ★
+                        </p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-stone-900 text-sm">
+                      INR {restaurant.revenue.toLocaleString("en-IN")}
+                    </span>
                   </div>
                 ))}
               </div>
             </SectionCard>
 
-            <SectionCard title="Top Items" subtitle="Best dishes to highlight in promotion banners.">
-              <div className="space-y-4">
+            <SectionCard
+              title="Top Menu Movers"
+              subtitle="High-velocity dishes suitable for menu promotion banners."
+            >
+              <div className="space-y-3 pt-1">
                 {report.topItems.map((item, index) => (
-                  <div key={item.name} className="rounded-2xl border border-slate-200 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Item #{index + 1}</p>
-                    <p className="mt-1 font-semibold text-slate-900">{item.name}</p>
-                    <p className="text-sm text-slate-500">{item.orders} portions ordered</p>
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between rounded-2xl border border-brand-100/70 bg-white/95 p-3.5 shadow-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 font-bold text-amber-700 text-xs">
+                        #{index + 1}
+                      </span>
+                      <p className="text-sm font-bold text-stone-900">{item.name}</p>
+                    </div>
+                    <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+                      {item.orders} ordered
+                    </span>
                   </div>
                 ))}
               </div>

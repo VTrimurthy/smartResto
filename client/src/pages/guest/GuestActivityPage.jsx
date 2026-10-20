@@ -1,4 +1,4 @@
-import { PencilLine, Trash2 } from "lucide-react";
+import { Calendar, CheckCircle2, Clock, MapPin, PencilLine, ShoppingBag, Sparkles, Table2, Trash2, Users, UtensilsCrossed } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -83,9 +83,9 @@ const GuestActivityPage = () => {
 
   const stats = useMemo(
     () => [
-      { title: "Bookings", value: records.bookings.length, subtitle: "Your active table bookings" },
-      { title: "Reservations", value: records.reservations.length, subtitle: "Advance reservations you created" },
-      { title: "Orders", value: records.orders.length, subtitle: "Your placed food orders" },
+      { title: "Table Bookings", value: records.bookings.length, subtitle: "Confirmed & pending table slots", icon: Table2 },
+      { title: "Reservations", value: records.reservations.length, subtitle: "Scheduled advance dining dates", icon: Calendar },
+      { title: "Food Orders", value: records.orders.length, subtitle: "Total placed kitchen orders", icon: ShoppingBag },
     ],
     [records]
   );
@@ -149,13 +149,18 @@ const GuestActivityPage = () => {
 
   if (!user) {
     return (
-      <section className="px-6 py-16 md:px-10">
-        <div className="mx-auto max-w-3xl">
-          <SectionCard title="Login Required" subtitle="Sign in as a guest user to manage your bookings, reservations, and orders.">
-            <Link to="/login" className="btn-primary">
-              Login as Guest
+      <section className="px-6 py-20 md:px-10">
+        <div className="mx-auto max-w-xl text-center">
+          <div className="glass-panel p-8">
+            <UtensilsCrossed className="mx-auto h-12 w-12 text-brand-500 mb-4" />
+            <h2 className="font-display text-3xl font-bold text-stone-900">Sign In Required</h2>
+            <p className="mt-2 text-sm text-stone-600 mb-6">
+              Sign in with your guest account to manage and track your bookings, reservations, and orders.
+            </p>
+            <Link to="/login" className="btn-primary w-full justify-center">
+              Login to Guest Portal
             </Link>
-          </SectionCard>
+          </div>
         </div>
       </section>
     );
@@ -163,159 +168,303 @@ const GuestActivityPage = () => {
 
   if (user.role !== "guest") {
     return (
-      <section className="px-6 py-16 md:px-10">
-        <div className="mx-auto max-w-3xl">
-          <SectionCard title="Guest Activity" subtitle="This page is intended for guest accounts. Admin and staff accounts should use the dashboard.">
-            <Link to="/dashboard" className="btn-primary">
-              Open Dashboard
+      <section className="px-6 py-20 md:px-10">
+        <div className="mx-auto max-w-xl text-center">
+          <div className="glass-panel p-8">
+            <h2 className="font-display text-3xl font-bold text-stone-900">Operations Team Portal</h2>
+            <p className="mt-2 text-sm text-stone-600 mb-6">
+              You are signed in with an administrative staff role ({user.role}). Full branch operations are managed from the executive dashboard.
+            </p>
+            <Link to="/dashboard" className="btn-primary w-full justify-center">
+              Enter Operations Dashboard
             </Link>
-          </SectionCard>
+          </div>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="px-6 py-12 md:px-10 md:py-20">
+    <section className="relative overflow-hidden px-6 py-12 md:px-10 md:py-20">
+      {/* Background radial ambiance */}
+      <div className="pointer-events-none absolute -left-20 top-20 h-96 w-96 rounded-full bg-brand-200/25 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-40 h-80 w-80 rounded-full bg-amber-200/30 blur-3xl" />
+
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex rounded-full border border-brand-100 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 shadow-sm">
-            Guest Account
+        {/* Page Header */}
+        <div className="mb-12 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-200/90 bg-white/95 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.26em] text-brand-700 shadow-sm backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5 text-brand-500" />
+            <span>Guest Activity Central</span>
           </div>
-          <h1 className="font-display text-4xl font-bold text-stone-900 md:text-5xl">Manage My Activity</h1>
-          <p className="mx-auto mt-4 max-w-3xl text-stone-600">
-            Review, update, and delete your own bookings, reservations, and food orders from one clean guest control page.
+
+          <h1 className="font-display text-4xl font-bold tracking-tight text-stone-900 md:text-6xl">
+            My Dining Journey & Orders
+          </h1>
+
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+            Real-time status tracking and controls for all your active table reservations, advance bookings, and live kitchen orders.
           </p>
         </div>
 
-        {message ? <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">{message}</div> : null}
-        {error ? <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</div> : null}
+        {/* Global Feedback Notifications */}
+        {message && (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-sm font-semibold text-emerald-800 shadow-sm animate-in fade-in">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+            <span>{message}</span>
+          </div>
+        )}
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
+        {error && (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-sm font-semibold text-rose-800 shadow-sm animate-in fade-in">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-200 text-rose-800 text-xs font-bold">!</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Top Summary Stat Cards */}
+        <div className="mb-10 grid gap-5 md:grid-cols-3">
           {stats.map((item) => (
-            <StatCard key={item.title} title={item.title} value={item.value} subtitle={item.subtitle} />
+            <StatCard key={item.title} title={item.title} value={item.value} subtitle={item.subtitle} icon={item.icon} />
           ))}
         </div>
 
-        <div className="grid gap-6">
-          <SectionCard title="My Bookings" subtitle="Edit or delete your booked table slots.">
-            <div className="grid gap-4 md:grid-cols-2">
+        {/* Triple Section Panels: Bookings, Reservations, Orders */}
+        <div className="space-y-10">
+          {/* Table Bookings */}
+          <SectionCard
+            title="My Table Bookings"
+            subtitle="Immediate table bookings assigned to restaurant branches."
+            action={
+              <Link to="/book-table" className="btn-secondary py-2 text-xs">
+                + New Booking
+              </Link>
+            }
+          >
+            <div className="grid gap-5 md:grid-cols-2">
               {records.bookings.length ? (
                 records.bookings.map((item) => (
-                  <div key={item._id} className="rounded-3xl border border-slate-200 bg-white p-5">
-                    <div className="flex items-start justify-between gap-3">
+                  <div
+                    key={item._id}
+                    className="glass-panel group relative overflow-hidden p-6 transition duration-300 hover:border-brand-300 hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between gap-3 border-b border-brand-100/60 pb-4">
                       <div>
-                        <p className="font-semibold text-slate-900">{item.restaurant?.name}</p>
-                        <p className="text-sm text-slate-500">
-                          {formatDate(item.bookingDate)} at {formatTime(item.timeSlot)}
+                        <p className="font-bold text-stone-900 text-lg group-hover:text-brand-600 transition">
+                          {item.restaurant?.name || "Branch"}
+                        </p>
+                        <p className="mt-1 flex items-center gap-1.5 text-xs text-stone-500 font-medium">
+                          <Clock className="h-3.5 w-3.5 text-brand-500" />
+                          <span>{formatDate(item.bookingDate)} at {formatTime(item.timeSlot)}</span>
                         </p>
                       </div>
                       <StatusBadge value={item.status} />
                     </div>
-                    <p className="mt-3 text-sm text-slate-600">{item.guestCount} guests - {item.occasion || "Regular dining"}</p>
-                    <div className="mt-4 flex gap-2">
-                      <button type="button" onClick={() => openEditModal("bookings", item)} className="btn-secondary flex-1 py-2 text-sm">
-                        <PencilLine className="mr-2 h-4 w-4" />
-                        Edit
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-stone-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">
+                        <Users className="h-3 w-3" />
+                        <span>{item.guestCount} Guests</span>
+                      </span>
+                      {item.table && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 font-semibold text-stone-700">
+                          <Table2 className="h-3 w-3" />
+                          <span>Table {item.table?.tableNumber || item.table}</span>
+                        </span>
+                      )}
+                      <span className="text-stone-500 italic">{item.occasion || "Standard Dining"}</span>
+                    </div>
+
+                    {item.specialRequest && (
+                      <p className="mt-3 rounded-xl bg-stone-50 p-2.5 text-xs text-stone-600 italic">
+                        "{item.specialRequest}"
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex gap-2 border-t border-brand-100/50 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal("bookings", item)}
+                        className="btn-secondary flex-1 py-2 text-xs"
+                      >
+                        <PencilLine className="mr-1.5 h-3.5 w-3.5" />
+                        <span>Edit</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete("bookings", item)}
-                        className="flex-1 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600"
+                        className="flex-1 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100"
                       >
-                        <Trash2 className="mr-2 inline h-4 w-4" />
-                        Delete
+                        <Trash2 className="mr-1.5 inline h-3.5 w-3.5" />
+                        <span>Cancel</span>
                       </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-500">No bookings yet. Create one from the Book Table page.</p>
+                <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center md:col-span-2">
+                  <p className="text-sm font-semibold text-stone-700">No active table bookings found.</p>
+                  <p className="mt-1 text-xs text-stone-400">Reserve a table anytime from the booking module.</p>
+                </div>
               )}
             </div>
           </SectionCard>
 
-          <SectionCard title="My Reservations" subtitle="Update future reservation details or remove them.">
-            <div className="grid gap-4 md:grid-cols-2">
+          {/* Advance Reservations */}
+          <SectionCard
+            title="Advance Reservations"
+            subtitle="Scheduled dining reservations with preferred dining areas."
+            action={
+              <Link to="/book-table" className="btn-secondary py-2 text-xs">
+                + New Reservation
+              </Link>
+            }
+          >
+            <div className="grid gap-5 md:grid-cols-2">
               {records.reservations.length ? (
                 records.reservations.map((item) => (
-                  <div key={item._id} className="rounded-3xl border border-slate-200 bg-white p-5">
-                    <div className="flex items-start justify-between gap-3">
+                  <div
+                    key={item._id}
+                    className="glass-panel group relative overflow-hidden p-6 transition duration-300 hover:border-brand-300 hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between gap-3 border-b border-brand-100/60 pb-4">
                       <div>
-                        <p className="font-semibold text-slate-900">{item.restaurant?.name}</p>
-                        <p className="text-sm text-slate-500">
-                          {formatDate(item.reservationDate)} at {formatTime(item.timeSlot)}
+                        <p className="font-bold text-stone-900 text-lg group-hover:text-brand-600 transition">
+                          {item.restaurant?.name || "Branch"}
+                        </p>
+                        <p className="mt-1 flex items-center gap-1.5 text-xs text-stone-500 font-medium">
+                          <Calendar className="h-3.5 w-3.5 text-brand-500" />
+                          <span>{formatDate(item.reservationDate)} at {formatTime(item.timeSlot)}</span>
                         </p>
                       </div>
                       <StatusBadge value={item.status} />
                     </div>
-                    <p className="mt-3 text-sm text-slate-600">{item.guestCount} guests - {item.areaPreference || "Indoor"}</p>
-                    <div className="mt-4 flex gap-2">
-                      <button type="button" onClick={() => openEditModal("reservations", item)} className="btn-secondary flex-1 py-2 text-sm">
-                        <PencilLine className="mr-2 h-4 w-4" />
-                        Edit
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-stone-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 font-semibold text-brand-700">
+                        <Users className="h-3 w-3" />
+                        <span>{item.guestCount} Guests</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 font-semibold text-stone-700">
+                        <MapPin className="h-3 w-3" />
+                        <span>{item.areaPreference || "Indoor Dining"}</span>
+                      </span>
+                    </div>
+
+                    {item.specialRequest && (
+                      <p className="mt-3 rounded-xl bg-stone-50 p-2.5 text-xs text-stone-600 italic">
+                        "{item.specialRequest}"
+                      </p>
+                    )}
+
+                    <div className="mt-5 flex gap-2 border-t border-brand-100/50 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal("reservations", item)}
+                        className="btn-secondary flex-1 py-2 text-xs"
+                      >
+                        <PencilLine className="mr-1.5 h-3.5 w-3.5" />
+                        <span>Edit</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete("reservations", item)}
-                        className="flex-1 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600"
+                        className="flex-1 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100"
                       >
-                        <Trash2 className="mr-2 inline h-4 w-4" />
-                        Delete
+                        <Trash2 className="mr-1.5 inline h-3.5 w-3.5" />
+                        <span>Cancel</span>
                       </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-500">No reservations yet. Create one from the Book Table page.</p>
+                <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center md:col-span-2">
+                  <p className="text-sm font-semibold text-stone-700">No advance reservations scheduled.</p>
+                  <p className="mt-1 text-xs text-stone-400">Plan ahead for upcoming occasions or gatherings.</p>
+                </div>
               )}
             </div>
           </SectionCard>
 
-          <SectionCard title="My Orders" subtitle="Review and edit your own orders before they are processed.">
-            <div className="grid gap-4 md:grid-cols-2">
+          {/* Kitchen Orders */}
+          <SectionCard
+            title="My Food Orders"
+            subtitle="Track kitchen preparation and delivery status in real-time."
+            action={
+              <Link to="/order-online" className="btn-secondary py-2 text-xs">
+                + Order More
+              </Link>
+            }
+          >
+            <div className="grid gap-5 md:grid-cols-2">
               {records.orders.length ? (
                 records.orders.map((item) => (
-                  <div key={item._id} className="rounded-3xl border border-slate-200 bg-white p-5">
-                    <div className="flex items-start justify-between gap-3">
+                  <div
+                    key={item._id}
+                    className="glass-panel group relative overflow-hidden p-6 transition duration-300 hover:border-brand-300 hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between gap-3 border-b border-brand-100/60 pb-4">
                       <div>
-                        <p className="font-semibold text-slate-900">{item.orderNumber}</p>
-                        <p className="text-sm text-slate-500">{item.restaurant?.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-mono text-xs font-bold text-brand-600 uppercase tracking-wider">{item.orderNumber}</p>
+                          <span className="text-stone-300">•</span>
+                          <span className="text-xs font-semibold uppercase text-stone-500">{item.orderType}</span>
+                        </div>
+                        <p className="mt-1 font-bold text-stone-900">{item.restaurant?.name || "Restaurant"}</p>
                       </div>
                       <StatusBadge value={item.status} />
                     </div>
-                    <p className="mt-3 text-sm text-slate-600">
-                      {(item.items || []).map((orderItem) => `${orderItem.name} x${orderItem.quantity}`).join(", ")}
-                    </p>
-                    <p className="mt-3 font-semibold text-amber-600">{formatCurrency(item.totalAmount)}</p>
-                    <div className="mt-4 flex gap-2">
-                      <button type="button" onClick={() => openEditModal("orders", item)} className="btn-secondary flex-1 py-2 text-sm">
-                        <PencilLine className="mr-2 h-4 w-4" />
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete("orders", item)}
-                        className="flex-1 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-600"
-                      >
-                        <Trash2 className="mr-2 inline h-4 w-4" />
-                        Delete
-                      </button>
+
+                    <div className="mt-4 space-y-1.5">
+                      {(item.items || []).map((orderItem, idx) => (
+                        <div key={idx} className="flex items-center justify-between text-xs text-stone-600">
+                          <span className="font-medium">{orderItem.name} × {orderItem.quantity}</span>
+                          <span className="font-semibold text-stone-800">{formatCurrency(orderItem.price * orderItem.quantity)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-brand-100/60 pt-4">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-stone-400">Total</span>
+                        <p className="text-lg font-bold text-brand-600">{formatCurrency(item.totalAmount)}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEditModal("orders", item)}
+                          className="btn-secondary py-1.5 px-3 text-xs"
+                        >
+                          <PencilLine className="mr-1 h-3.5 w-3.5" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete("orders", item)}
+                          className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-500">No orders yet. Create one from the Order Online page.</p>
+                <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center md:col-span-2">
+                  <p className="text-sm font-semibold text-stone-700">No active food orders found.</p>
+                  <p className="mt-1 text-xs text-stone-400">Order from our live gourmet menu anytime.</p>
+                </div>
               )}
             </div>
           </SectionCard>
         </div>
 
+        {/* Edit Modal */}
         <Modal
           open={Boolean(modalType && selectedItem)}
           onClose={closeModal}
           title={modalType ? `Edit ${guestConfigMap[modalType].title}` : "Edit"}
-          subtitle="Update your own record and save the changes."
+          subtitle="Update your record and synchronize with restaurant operations."
         >
           {modalType ? (
             <form onSubmit={handleSave} className="space-y-5">
@@ -333,12 +482,12 @@ const GuestActivityPage = () => {
                 ))}
               </div>
 
-              <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5">
+              <div className="flex flex-wrap justify-end gap-3 border-t border-brand-100/60 pt-5">
                 <button type="button" onClick={closeModal} className="btn-secondary">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} className="btn-primary">
-                  {saving ? "Saving..." : "Save Changes"}
+                  {saving ? "Saving Changes..." : "Save Changes"}
                 </button>
               </div>
             </form>

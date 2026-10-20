@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Plus, RefreshCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Lock, Plus, RefreshCcw, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 
 import api from "../../api/client";
@@ -141,7 +141,9 @@ const EntityManagerPage = ({ config, moduleKey }) => {
   };
 
   const invalidateRelatedData = () => {
-    queryClient.invalidateQueries((key) => key.includes(config.endpoint) || key.includes("dashboard-summary") || key.includes("reports-overview"));
+    queryClient.invalidateQueries(config.endpoint);
+    queryClient.invalidateQueries("dashboard-summary");
+    queryClient.invalidateQueries("reports-overview");
   };
 
   const handleSubmit = async (event) => {
@@ -154,20 +156,25 @@ const EntityManagerPage = ({ config, moduleKey }) => {
 
       if (selectedItem) {
         await api.put(`${config.endpoint}/${selectedItem._id}`, payload);
+        pushToast({
+          tone: "success",
+          title: "Record updated",
+          message: `${config.title} was updated successfully.`,
+        });
       } else {
         await api.post(config.endpoint, payload);
+        pushToast({
+          tone: "success",
+          title: "Record created",
+          message: `${config.title} entry created successfully.`,
+        });
       }
 
-      invalidateRelatedData();
       closeModal();
+      invalidateRelatedData();
       await loadData();
-      pushToast({
-        tone: "success",
-        title: selectedItem ? "Record updated" : "Record created",
-        message: `${config.title} has been saved successfully.`,
-      });
     } catch (requestError) {
-      const message = requestError.response?.data?.message || "Unable to save the record.";
+      const message = requestError.response?.data?.message || "Unable to save changes.";
       setError(message);
       pushToast({
         tone: "error",
@@ -184,11 +191,11 @@ const EntityManagerPage = ({ config, moduleKey }) => {
       return;
     }
 
+    const itemLabel = item.name || item.orderNumber || item.guestName || "this entry";
     const confirmed = await confirm({
-      title: `Delete ${config.buttonLabel.replace("Add ", "")}?`,
-      description: `This will permanently remove "${item.name || item.guestName || item.orderNumber}" from ${config.title.toLowerCase()}.`,
-      confirmLabel: "Delete",
-      tone: "danger",
+      title: `Delete ${itemLabel}?`,
+      description: "This action will remove the record permanently from the operations database.",
+      confirmLabel: "Delete Record",
     });
 
     if (!confirmed) {
@@ -222,19 +229,27 @@ const EntityManagerPage = ({ config, moduleKey }) => {
   return (
     <div>
       <PageHeader
-        eyebrow="Management Module"
+        eyebrow="Operations Management"
         title={config.title}
         description={config.subtitle}
         action={
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={loadData} className="btn-secondary">
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              Refresh
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={loadData}
+              className="btn-secondary py-2.5 text-xs font-bold"
+            >
+              <RefreshCcw className="mr-1.5 h-3.5 w-3.5 text-stone-500" />
+              <span>Refresh</span>
             </button>
             {permissions.create ? (
-              <button type="button" onClick={openCreateModal} className="btn-primary">
-                <Plus className="mr-2 h-4 w-4" />
-                {config.buttonLabel}
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="btn-primary py-2.5 text-xs font-bold shadow-md shadow-brand-500/25"
+              >
+                <Plus className="mr-1.5 h-4 w-4" />
+                <span>{config.buttonLabel}</span>
               </button>
             ) : null}
           </div>
@@ -242,39 +257,52 @@ const EntityManagerPage = ({ config, moduleKey }) => {
       />
 
       {error ? (
-        <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">{error}</div>
+        <div className="mb-6 flex items-center gap-2.5 rounded-2xl border border-rose-200 bg-rose-50/90 px-5 py-4 text-sm font-medium text-rose-700 shadow-sm">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-200 text-rose-800 text-xs font-bold">!</span>
+          <span>{error}</span>
+        </div>
       ) : null}
 
       {highlights.length ? (
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <div className="mb-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {highlights.map((item) => (
             <StatCard key={item.title} title={item.title} value={item.value} subtitle={item.subtitle} />
           ))}
         </div>
       ) : null}
 
-      <div className="mb-6 rounded-[26px] border border-brand-100 bg-[#fff8f1] px-5 py-4 text-sm text-stone-600">{accessSummary}</div>
+      {/* Role access reassurance bar */}
+      <div className="mb-6 flex items-center justify-between rounded-2xl border border-brand-200/80 bg-brand-50/70 px-5 py-3 text-xs font-semibold text-brand-900 shadow-sm">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-brand-600" />
+          <span>{accessSummary}</span>
+        </div>
+        <span className="text-[10px] uppercase font-bold tracking-wider text-brand-600">Active Module</span>
+      </div>
 
       <SectionCard
-        title="Current Records"
-        subtitle="Search, filter, review, update, and remove records from one workspace."
+        title="Operating Database Records"
+        subtitle="Search, filter, update, and manage entries with automatic relation syncing."
         action={
           <div className="flex flex-col gap-3 md:items-end">
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={config.searchPlaceholder}
-              className="input-shell md:w-80"
-            />
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={config.searchPlaceholder}
+                className="input-shell pl-10 md:w-80"
+              />
+            </div>
             {config.filters?.length ? (
-              <div className="flex flex-wrap gap-3 md:justify-end">
+              <div className="flex flex-wrap gap-2.5 md:justify-end">
                 {config.filters.map((filter) => (
                   <select
                     key={filter.name}
                     value={filters[filter.name] ?? "all"}
                     onChange={(event) => setFilters((current) => ({ ...current, [filter.name]: event.target.value }))}
-                    className="input-shell min-w-[148px]"
+                    className="input-shell font-semibold text-xs min-w-[140px]"
                   >
                     {filter.options.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -298,51 +326,63 @@ const EntityManagerPage = ({ config, moduleKey }) => {
         />
 
         {pagination ? (
-          <div className="mt-5 flex flex-col gap-3 border-t border-stone-200 pt-5 md:flex-row md:items-center md:justify-between">
-            <p className="text-sm text-stone-500">
-              Page {pagination.page} of {pagination.totalPages} - {pagination.total} records
+          <div className="mt-6 flex flex-col gap-3 border-t border-brand-100/60 pt-5 md:flex-row md:items-center md:justify-between text-xs">
+            <p className="font-semibold text-stone-500">
+              Showing page <span className="font-bold text-stone-800">{pagination.page}</span> of {pagination.totalPages} ({pagination.total} total records)
             </p>
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={pagination.page <= 1} className="btn-secondary px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50">
-                <ChevronLeft className="mr-1 h-4 w-4" />
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={pagination.page <= 1}
+                className="btn-secondary px-4 py-2 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronLeft className="mr-1 h-3.5 w-3.5" />
                 Previous
               </button>
               <button
                 type="button"
                 onClick={() => setPage((current) => Math.min(pagination.totalPages, current + 1))}
                 disabled={pagination.page >= pagination.totalPages}
-                className="btn-secondary px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-secondary px-4 py-2 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
-                <ChevronRight className="ml-1 h-4 w-4" />
+                <ChevronRight className="ml-1 h-3.5 w-3.5" />
               </button>
             </div>
           </div>
         ) : null}
       </SectionCard>
 
+      {/* Create / Edit Modal */}
       {permissions.create || permissions.edit ? (
         <Modal
           open={modalOpen}
           onClose={closeModal}
           title={selectedItem ? `Edit ${config.buttonLabel.replace("Add ", "")}` : config.buttonLabel}
-          subtitle="Update the form and save to apply changes to the workspace."
+          subtitle="Complete the form fields below and save to apply changes immediately."
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-4 md:grid-cols-2">
               {config.fields.map((field) => (
                 <div key={field.name} className={field.type === "textarea" || field.type === "file" ? "md:col-span-2" : ""}>
-                  <FormField field={field} value={formValues[field.name]} onChange={handleFieldChange} dependencies={dependencies} formValues={formValues} />
+                  <FormField
+                    field={field}
+                    value={formValues[field.name]}
+                    onChange={handleFieldChange}
+                    dependencies={dependencies}
+                    formValues={formValues}
+                  />
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5">
+            <div className="flex flex-wrap justify-end gap-3 border-t border-brand-100/60 pt-5">
               <button type="button" onClick={closeModal} className="btn-secondary">
                 Cancel
               </button>
-              <button type="submit" disabled={submitting} className="btn-primary">
-                {submitting ? "Saving..." : selectedItem ? "Update Record" : "Create Record"}
+              <button type="submit" disabled={submitting} className="btn-primary font-bold">
+                {submitting ? "Processing..." : selectedItem ? "Update Record" : "Create Record"}
               </button>
             </div>
           </form>

@@ -36,8 +36,8 @@ export const ConfirmDialogProvider = ({ children }) => {
     <ConfirmDialogContext.Provider value={value}>
       {children}
       {dialog ? (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center bg-[#1f1712]/58 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[30px] border border-stone-200 bg-[rgba(255,250,244,0.98)] p-6 shadow-2xl">
+        <div className="fixed inset-0 z-[65] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[30px] border border-brand-100 bg-white/98 p-6 shadow-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-600">Please confirm</p>
             <h3 className="mt-3 font-display text-4xl leading-none text-stone-900">{dialog.title}</h3>
             {dialog.description ? <p className="mt-4 text-sm leading-6 text-stone-600">{dialog.description}</p> : null}

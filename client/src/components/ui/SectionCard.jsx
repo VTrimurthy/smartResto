@@ -1,12 +1,20 @@
 const SectionCard = ({ title, subtitle, action, children, className = "" }) => (
-  <section className={`glass-panel p-6 ${className}`}>
+  <section className={`glass-panel p-6 md:p-7 transition-all duration-300 ${className}`}>
     {(title || subtitle || action) && (
-      <div className="mb-5 flex flex-col gap-3 border-b border-stone-200/80 pb-5 md:flex-row md:items-center md:justify-between">
+      <div className="mb-6 flex flex-col gap-3 border-b border-brand-100/70 pb-5 md:flex-row md:items-center md:justify-between">
         <div>
-          {title ? <h2 className="font-display text-[1.9rem] font-semibold leading-none text-stone-900">{title}</h2> : null}
-          {subtitle ? <p className="mt-2 text-sm leading-6 text-stone-500">{subtitle}</p> : null}
+          {title ? (
+            <h2 className="font-display text-2xl font-bold tracking-tight text-stone-900 md:text-[1.85rem]">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="mt-1 text-sm leading-relaxed text-stone-500">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
-        {action}
+        {action && <div className="flex items-center gap-2.5">{action}</div>}
       </div>
     )}
     {children}
